@@ -1,15 +1,10 @@
 package client.redis.utils;
 
 import client.redis.factory.JedisFactory;
-import client.redis.publisher.Publisher;
-import client.redis.store.RedisStore;
-import client.redis.subscriber.Subscriber;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
-import redis.clients.jedis.Jedis;
+import org.junit.jupiter.api.Test;
 import redis.clients.jedis.JedisPubSub;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RedisUtilsTest {
 
@@ -28,7 +23,7 @@ public class RedisUtilsTest {
 
         new Thread(() ->
                 JedisFactory.get()
-                        .getRedisConncetion()
+                        .getRedisConnection()
                         .subscribe(subscriber, channelName))
                 .start();
 

@@ -1,10 +1,11 @@
 package client.redis.store;
 
 import client.redis.store.impl.RedisStoreImpl;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class RedisStoreTest {
 
@@ -12,7 +13,7 @@ public class RedisStoreTest {
     private String val = "Test Value";
     private RedisStore redisStore = null;
 
-    @Before
+    @BeforeEach
     public void initTest() {
         redisStore = new RedisStoreImpl();
     }

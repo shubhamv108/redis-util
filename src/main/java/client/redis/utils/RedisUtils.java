@@ -9,7 +9,7 @@ import redis.clients.jedis.Jedis;
 public class RedisUtils {
 
     public static Long publish (String channel, String message) {
-        return publish (JedisFactory.get().getRedisConncetion(), channel, message);
+        return publish (JedisFactory.get().getRedisConnection(), channel, message);
     }
 
     public static Long publish (Jedis jedis, String channel, String message) {
@@ -17,7 +17,7 @@ public class RedisUtils {
     }
 
     public static Long publish (String dbName, String channel, String message) {
-        return publish(JedisFactory.get(dbName).getRedisConncetion(), channel, message);
+        return publish(JedisFactory.get(dbName).getRedisConnection(), channel, message);
     }
 
 }

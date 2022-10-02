@@ -125,7 +125,7 @@ public class JedisFactory {
      * @return Jedis
  *              the connection from pool
      */
-    public Jedis getRedisConncetion() {
+    public Jedis getRedisConnection() {
         try {
             Jedis jedis = jedisPool.getResource();
             if (index > 0)

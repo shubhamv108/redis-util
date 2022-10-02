@@ -1,6 +1,10 @@
 package client.redis.store;
 
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Transaction;
+
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -64,6 +68,21 @@ public interface RedisStore {
      * @param args
      * @return
      */
-    Object execute (Function<Object[], Object> f, Object[] args);
+    Object execute (BiFunction<Object[], Jedis, Object> f, Object[] args);
 
+    String loadLuaScript(String luaScript);
+
+    Object executeLuaScript(String luaScriptHash, String luaScript);
+
+    Object executeLuaScript(String luaScriptHash,
+                            List<String> keys,
+                            List<String> args,
+                            String luaScript);
+
+    Object executeTransaction(List<Function<Transaction, Object>> operations);
+
+    String lockWithoutVersionIfNotExistsInSingleRedisInstance(String resourceName, String ownerName, Long timeToLiveInMilliseconds);
+    Long releaseLockInSingleRedisInstance(String resourceName, String ownerName);
+
+    Long redLock(String resourceName, String ownerName);
 }
