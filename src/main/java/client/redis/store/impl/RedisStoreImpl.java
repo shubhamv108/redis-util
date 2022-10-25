@@ -216,7 +216,7 @@ public class RedisStoreImpl implements RedisStore {
         try {
             result = jedis.evalsha(luaScriptHash, keys, args);
         } catch (JedisNoScriptException noScriptException) {
-            log.error("Redis:evalSha | No Script for hash: {}", luaScriptHash, noScriptException);
+            log.error("Redis:evalSha | No Script for code.shubham.hash: {}", luaScriptHash, noScriptException);
             luaScriptHash = this.loadLuaScript(luaScript);
             return this.executeLuaScript(luaScriptHash, luaScript);
         } catch (Exception e) {
