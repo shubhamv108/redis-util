@@ -29,18 +29,18 @@ import java.util.function.Function;
  * @see client.redis.factory.JedisFactory
  */
 @Slf4j
-public class RedisStoreImpl implements RedisStore {
+public class JedisStore implements RedisStore {
 
 
     private Map<String, String> luaScriptHashes = new HashMap<>();
 
     private JedisFactory jedisFactory;
 
-    public RedisStoreImpl() {
+    public JedisStore() {
         this(null);
     }
 
-    public RedisStoreImpl(String dbName) {
+    public JedisStore(String dbName) {
         if (dbName == null || dbName.isEmpty())
             this.jedisFactory = JedisFactory.get();
         else
@@ -53,7 +53,6 @@ public class RedisStoreImpl implements RedisStore {
                 Constants.RELEASE_LOCK_WITH_VALUE_TAKEN_IN_SINGLE_INSTANCE_HASH_KEY,
                 this.loadLuaScript(LuaScript.RELEASE_LOCK_FOR_VALUE_TAKEN_IN_SINGLE_INSTANCE));
     }
-
 
     @Override
     public void save(byte[] key, byte[] value) {
@@ -158,6 +157,33 @@ public class RedisStoreImpl implements RedisStore {
         return list;
     }
 
+    public List<String> mGet (String... keys) {
+        Jedis jedis = jedisFactory.getRedisConnection();
+        try {
+            double inc = 1.0;
+            List<String> values = jedis.mget(keys);
+            return values;
+        } catch (Exception e) {
+            throw new RedisCacheException(e);
+        } finally {
+            jedisFactory.returnConnection(jedis);
+        }
+    }
+
+    public long hSet (String key, Map<String, String> hash) {
+        Jedis jedis = jedisFactory.getRedisConnection();
+        try {
+            double inc = 1.0;
+            long values = jedis.hset(key, hash);
+            return values;
+        } catch (Exception e) {
+            throw new RedisCacheException(e);
+        } finally {
+            jedisFactory.returnConnection(jedis);
+        }
+    }
+
+
     @Override
     public Long waitReplicas (int replicas, long timeout) {
         Long replicasReached = 0L;
@@ -185,6 +211,18 @@ public class RedisStoreImpl implements RedisStore {
             jedisFactory.returnConnection(jedis);
         }
         return result;
+    }
+
+    @Override
+    public void loadLuaScripts(String luaScriptHashKey, String luaScript) {
+        if (this.luaScriptHashes.containsKey(luaScriptHashKey))
+            return;
+        this.luaScriptHashes.put(luaScriptHashKey, this.loadLuaScript(luaScript));
+    }
+
+    @Override
+    public void loadLuaScript(String luaScriptHashKey, String luaScript) {
+        this.luaScriptHashes.put(luaScriptHashKey, this.loadLuaScript(luaScript));
     }
 
     @Override
@@ -218,6 +256,33 @@ public class RedisStoreImpl implements RedisStore {
         } catch (JedisNoScriptException noScriptException) {
             log.error("Redis:evalSha | No Script for code.shubham.hash: {}", luaScriptHash, noScriptException);
             luaScriptHash = this.loadLuaScript(luaScript);
+            return this.executeLuaScript(luaScriptHash, luaScript);
+        } catch (Exception e) {
+            log.error("Redis:evalSha | Error executing redis operation", e);
+        } finally {
+            jedisFactory.returnConnection(jedis);
+        }
+        return result;
+    }
+
+    @Override
+    public Object executeLuaScriptForHashKey(
+            String luaScriptHashKey,
+            List<String> keys,
+            List<String> args,
+            String luaScript) {
+        Object result = null;
+        Jedis jedis = jedisFactory.getRedisConnection();
+        String luaScriptHash = null;
+        try {
+            luaScriptHash = this.luaScriptHashes.get(luaScriptHashKey);
+            if (luaScriptHash == null)
+                this.loadLuaScript(luaScriptHashKey, luaScript);
+            result = jedis.evalsha(luaScriptHash, keys, args);
+        } catch (JedisNoScriptException noScriptException) {
+            log.error("Redis:evalSha | No Script for code.shubham.hash: {}", luaScriptHash, noScriptException);
+            this.loadLuaScript(luaScriptHashKey, luaScript);
+            luaScriptHash =  this.luaScriptHashes.get(luaScriptHashKey);
             return this.executeLuaScript(luaScriptHash, luaScript);
         } catch (Exception e) {
             log.error("Redis:evalSha | Error executing redis operation", e);

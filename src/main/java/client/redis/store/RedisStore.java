@@ -1,5 +1,6 @@
 package client.redis.store;
 
+import client.redis.store.impl.JedisStore;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
 
@@ -10,9 +11,11 @@ import java.util.function.Function;
 /**
  * Redis Store
  *
- * @see client.redis.store.impl.RedisStoreImpl
+ * @see JedisStore
  */
 public interface RedisStore {
+
+    void loadLuaScripts(String luaScriptHashKey, String luaScript);
 
     /**
      * @param key
@@ -70,6 +73,8 @@ public interface RedisStore {
      */
     Object execute (BiFunction<Object[], Jedis, Object> f, Object[] args);
 
+    void loadLuaScript(String luaScriptHashKey, String luaScript);
+
     String loadLuaScript(String luaScript);
 
     Object executeLuaScript(String luaScriptHash, String luaScript);
@@ -78,6 +83,12 @@ public interface RedisStore {
                             List<String> keys,
                             List<String> args,
                             String luaScript);
+
+    Object executeLuaScriptForHashKey(
+            String luaScriptHashKey,
+            List<String> keys,
+            List<String> args,
+            String luaScript);
 
     Object executeTransaction(List<Function<Transaction, Object>> operations);
 

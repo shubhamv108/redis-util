@@ -1,7 +1,7 @@
 package client.redis;
 
 import client.redis.store.RedisStore;
-import client.redis.store.impl.RedisStoreImpl;
+import client.redis.store.impl.JedisStore;
 import redis.clients.jedis.Transaction;
 
 import java.util.Arrays;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class RedisClientTest {
 
     public static void main(String[] args) {
-        RedisStore redisStore = new RedisStoreImpl();
+        RedisStore redisStore = new JedisStore();
         redisStore.save("key", "val");
         if ("val".equals(redisStore.get("key")))
             System.out.println("SUCCESS");
