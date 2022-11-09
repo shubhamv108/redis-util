@@ -4,6 +4,7 @@ plugins {
 
 group 'code.shubham.libraries.utils'
 version '1.0-SNAPSHOT'
+sourceCompatibility = 1.17
 
 repositories {
     mavenCentral()

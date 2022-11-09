@@ -1,6 +1,6 @@
 package client.redis.store;
 
-import client.redis.store.impl.RedisStoreImpl;
+import client.redis.store.impl.JedisStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ public class RedisStoreTest {
 
     @BeforeEach
     public void initTest() {
-        redisStore = new RedisStoreImpl();
+        redisStore = new JedisStore();
     }
 
     @Test
