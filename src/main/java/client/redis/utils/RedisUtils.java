@@ -9,6 +9,7 @@ import redis.clients.jedis.Jedis;
 public class RedisUtils {
 
     public static Long publish (String channel, String message) {
+
         return publish (JedisFactory.get().getRedisConnection(), channel, message);
     }
 

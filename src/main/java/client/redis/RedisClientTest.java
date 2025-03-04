@@ -3,8 +3,11 @@ package client.redis;
 import client.redis.store.RedisStore;
 import client.redis.store.impl.JedisStore;
 import redis.clients.jedis.Transaction;
+import redis.clients.jedis.args.GeoUnit;
+import redis.clients.jedis.resps.GeoRadiusResponse;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class RedisClientTest {
 
@@ -52,6 +55,12 @@ public class RedisClientTest {
         if (lockReleasedCount == 1)
             System.out.println("Lock released");
 
-    }
+        redisStore.geoadd("driverLocations", 12.971874171151056, 77.61064149207503, "driverId1");
+        redisStore.geoadd("driverLocations", 12.971874171151056, 77.61064149207503, "driverId2");
+        redisStore.geoadd("driverLocations", 12.971874171151056, 77.61064149207503, "driverId3");
 
+        List<GeoRadiusResponse> drivers = redisStore.georadius("driverLocations".getBytes(), 12.939358457323461, 77.69517104995907, 10, GeoUnit.KM);
+        System.out.println("Drivers= ");
+        drivers.forEach(driver -> System.out.println(driver.getMemberByString() + " " + driver.getCoordinate() + " " + driver.getDistance()));
+    }
 }

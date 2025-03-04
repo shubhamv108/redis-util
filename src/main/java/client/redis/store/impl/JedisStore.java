@@ -9,8 +9,10 @@ import client.redis.store.scripts.LuaScript;
 import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
+import redis.clients.jedis.args.GeoUnit;
 import redis.clients.jedis.exceptions.JedisNoScriptException;
 import redis.clients.jedis.params.SetParams;
+import redis.clients.jedis.resps.GeoRadiusResponse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -348,5 +350,30 @@ public class JedisStore implements RedisStore {
         return null;
     }
 
+    @Override
+    public long geoadd(String key, double longitude, double latitude, String member) {
+        Jedis jedis = jedisFactory.getRedisConnection();
+        try {
+            return jedis.geoadd(key, longitude, latitude, member);
+        } catch (Exception e) {
+            log.error("Redis:geoadd | Error Geo add | Key: {} | latitude: {} | longitude: {} | member: {}", key, latitude, longitude, member, e);
+            throw new RedisCacheException(RedisCacheErrorCodes.SAVE, e);
+        } finally {
+            jedisFactory.returnConnection(jedis);
+        }
+    }
+
+    @Override
+    public List<GeoRadiusResponse> georadius(byte[] key, double longitude, double latitude, double radius, GeoUnit unit)  {
+        Jedis jedis = jedisFactory.getRedisConnection();
+        try {
+            return jedis.georadius(key, longitude, latitude, radius, unit);
+        } catch (Exception e) {
+            log.error("Redis:georadius | Error georadius | Key: {} | latitude: {} | longitude: {} | radius: {} | unit: {}", key, latitude, longitude, radius, unit, e);
+            throw new RedisCacheException(RedisCacheErrorCodes.SAVE, e);
+        } finally {
+            jedisFactory.returnConnection(jedis);
+        }
+    }
 
 }

@@ -3,6 +3,8 @@ package client.redis.store;
 import client.redis.store.impl.JedisStore;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
+import redis.clients.jedis.args.GeoUnit;
+import redis.clients.jedis.resps.GeoRadiusResponse;
 
 import java.util.List;
 import java.util.function.BiFunction;
@@ -96,4 +98,7 @@ public interface RedisStore {
     Long releaseLockInSingleRedisInstance(String resourceName, String ownerName);
 
     Long redLock(String resourceName, String ownerName);
+
+    long geoadd(String key, double longitude, double latitude, String member);
+    List<GeoRadiusResponse> georadius(byte[] key, double longitude, double latitude, double radius, GeoUnit unit);
 }
